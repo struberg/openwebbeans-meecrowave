@@ -143,7 +143,7 @@ public class MeecrowaveTest {
     }
 
     @Test
-    public void simpleWebapp() {
+    public void simpleWebapp() throws Exception {
         final File root = new File("target/MeecrowaveTest/simpleWebapp/app");
         FileUtils.mkDir(root);
         Stream.of(Endpoint.class, RsApp.class).forEach(type -> {
@@ -172,10 +172,17 @@ public class MeecrowaveTest {
             assertEquals("simple", slurp(new URL("http://localhost:" + meecrowave.getConfiguration().getHttpPort() + "/api/other")));
             assertEquals("simplefiltertrue", slurp(new URL("http://localhost:" + meecrowave.getConfiguration().getHttpPort() + "/filter")));
             assertEquals("filtertrue", slurp(new URL("http://localhost:" + meecrowave.getConfiguration().getHttpPort() + "/other")));
-        } catch (final Exception e) {
-            fail(e.getMessage());
+
+            // check error handling
+            String msg = slurp(new URL("http://localhost:" + meecrowave.getConfiguration().getHttpPort() + "/api/test/blowup"));
+            // {"exceptionMessage":"intentionally blowing up","exceptionName":"IllegalArgumentException"}
+            // but we don't know the json ordering
+            assertTrue(msg.contains("\"exceptionMessage\":\"intentionally blowing up\""));
+            assertTrue(msg.contains("\"exceptionName\":\"IllegalArgumentException\""));
         }
+
     }
+
 
     @Test
     public void classpath() {

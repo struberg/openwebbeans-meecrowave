@@ -86,6 +86,13 @@ public class Endpoint {
         }
     }
 
+    @GET
+    @Path("blowup")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String blowup() {
+        throw new IllegalArgumentException("intentionally blowing up");
+    }
+
     public static class Simple {
         private String name;
 
